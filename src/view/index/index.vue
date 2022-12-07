@@ -9,9 +9,9 @@
 import {ref, onMounted} from "vue";
 import * as THREE from "three";
 import colorHol from '../../assets/textures/minecraft.png'
-import scene from "@/view/index/sceneFunction";
-import camera from "@/view/index/cameraFunction";
-import renderer from "@/view/index/rendererFunction";
+import scene from "@/tool/sceneFunction";
+import camera from "@/tool/cameraFunction";
+import renderer from "@/tool/rendererFunction";
 // 导入轨道控制器
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 let threejs = ref()
@@ -34,8 +34,9 @@ function createThree () {
 // 设置渲染的尺寸大小
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.shadowMap.enabled = true;
-  camera.position.set(0, 0, 10)
-  const axesHelper = new THREE.AxesHelper(5);
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMa
+  camera.position.set(0, 30, 100)
+  /*const axesHelper = new THREE.AxesHelper(5);
 
 // scene.add(cube)
 // cube.rotation.set(Math.PI / 4, 0, 0, "XZY");
@@ -56,60 +57,73 @@ function createThree () {
   scene.add(cube);
 
 // doorColorTexture.minFilter = THREE.NearestFilter;
-  doorColorTexture.magFilter = THREE.NearestMipMapNearestFilter;
+  doorColorTexture.magFilter = THREE.NearestMipMapNearestFilter;*/
 
-  scene.add(axesHelper);
+  // scene.add(axesHelper);
   scene.add(camera)
 }
-
-
-const light = new THREE.AmbientLight(0xffffff, 0.5); // soft white light
-// scene.add(light);
-//直线光源
-const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-let lightFzhu = new THREE.DirectionalLightHelper(directionalLight,2)
-scene.add(lightFzhu)
-directionalLight.position.set(10, 10, 10);
-directionalLight.castShadow = true;
-// 设置阴影贴图模糊度
-directionalLight.shadow.radius = 20;
-// 设置阴影贴图的分辨率
-directionalLight.shadow.mapSize.set(4096, 4096);
-// console.log(directionalLight.shadow);
-
-// 设置平行光投射相机的属性
-/*directionalLight.shadow.camera.near = 1;
-directionalLight.shadow.camera.far = 100;
-directionalLight.shadow.camera.top = 5;
-directionalLight.shadow.camera.bottom = 5;
-directionalLight.shadow.camera.left = 5;
-directionalLight.shadow.camera.right = 5;*/
-
-scene.add(directionalLight);
-
-const sphereGeometry = new THREE.SphereBufferGeometry(1, 20, 20);
-const material = new THREE.MeshStandardMaterial();
-const sphere = new THREE.Mesh(sphereGeometry, material);
-// 投射阴影
-sphere.castShadow = true;
-scene.add(sphere);
 const gui = new dat.GUI();
-// // 创建平面
-const planeGeometry = new THREE.PlaneBufferGeometry(100, 100);
-const plane = new THREE.Mesh(planeGeometry, material);
+
+//Create a DirectionalLight and turn on shadows for the light
+const light = new THREE.SpotLight( 0xffffff, 1 );
+light.position.set( 0, 30, 0 ); //default; light shining from top
+light.castShadow = true; // default false
+scene.add( light );
+
+//Set up shadow properties for the light
+light.shadow.mapSize.width = 512; // default
+light.shadow.mapSize.height = 512; // default
+light.shadow.camera.near = 0.5; // default
+light.shadow.camera.far = 500; // default
+
+//Create a sphere that cast shadows (but does not receive them)
+const sphereGeometry = new THREE.SphereGeometry( 5, 32, 32 );
+const sphereMaterial = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
+const sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
+sphere.position.set(0,7,0)
+sphere.castShadow = true; //default is false
+sphere.receiveShadow = false; //default
+scene.add( sphere );
+
+//Create a plane that receives shadows (but does not cast them)
+const planeGeometry = new THREE.PlaneGeometry( 200, 200, 32, 32 );
+const planeMaterial = new THREE.MeshStandardMaterial( { color: 0xffffff } )
+const plane = new THREE.Mesh( planeGeometry, planeMaterial );
+plane.receiveShadow = true;
 plane.position.set(0, -1, 0);
 plane.rotation.x = -Math.PI / 2;
-// 接收阴影
-plane.receiveShadow = true;
-scene.add(plane);
+scene.add( plane );
+
+//Create a helper for the shadow camera (optional)
+const helper = new THREE.DirectionalLightHelper( light, 0xffffff );
+scene.add( helper );
+console.log(light)
+
+const light1 = new THREE.PointLight( 0xffffff, 1, 20 );
+light1.position.set( 50, 50, 50 );
+scene.add( light1 );
+
+gui.add(sphere.position, "x").min(-5).max(5).step(0.1);
 gui
-    .add(directionalLight.shadow.camera, "near")
+    .add(light, "angle")
     .min(0)
-    .max(10)
-    .step(0.1)
-    .onChange(() => {
-      directionalLight.shadow.camera.updateProjectionMatrix();
-    });
+    .max(Math.PI / 2)
+    .step(0.01);
+gui.add(light, "distance").min(0).max(10).step(0.01);
+gui.add(light.position, "x").min(-10).max(10).step(0.01);
+gui.add(light.position, "y").min(-10).max(100).step(1);
+gui.add(light, "penumbra").min(0).max(1).step(0.01);
+gui.add(light, "decay").min(0).max(5).step(0.01);
+/*
+gui
+    .add(spotLight, "angle")
+    .min(0)
+    .max(Math.PI / 2)
+    .step(0.01);
+gui.add(spotLight, "distance").min(0).max(10).step(0.01);
+gui.add(spotLight, "penumbra").min(0).max(1).step(0.01);
+gui.add(spotLight, "decay").min(0).max(5).step(0.01);
+*/
 
 
 

@@ -13,6 +13,13 @@ const routes = [
                     import("../view/index/index"),
                 meta: { title: "工作台", icon: "icon-gongzuotai" },
             },
+            {
+                path: "/point",
+                name: "point",
+                component: () =>
+                    import("../view/point/index"),
+                meta: { title: "工作台", icon: "icon-gongzuotai" },
+            },
         ],
     },
 
