@@ -6,7 +6,7 @@
 
 <script setup>
 
-import {ref, onMounted} from "vue";
+import {ref, onMounted,onUnmounted} from "vue";
 import * as THREE from "three";
 import colorHol from '../../assets/textures/minecraft.png'
 import scene from "@/tool/sceneFunction";
@@ -20,12 +20,16 @@ let threejs = ref()
 // import gsap from "gsap";
 // 导入dat.gui
 import * as dat from "dat.gui";
-// import { color } from "dat.gui";
+let gui = new dat.GUI();
+let guiposition
+let guiangle
+let guidistance
+let guiX
+let guiY
+let guipenumbra
+let guidecay
 
 
-// const renderer = new THREE.WebGLRenderer();
-// const scene = new THREE.Scene();
-// const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
 const controls = new OrbitControls(camera, renderer.domElement)
 controls.enableDamping = true;
 const clock = new THREE.Clock();
@@ -36,84 +40,62 @@ function createThree () {
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMa
   camera.position.set(0, 30, 100)
-  /*const axesHelper = new THREE.AxesHelper(5);
-
-// scene.add(cube)
-// cube.rotation.set(Math.PI / 4, 0, 0, "XZY");
-
-
-  const textureLoader = new THREE.TextureLoader();
-  const doorColorTexture = textureLoader.load(colorHol);
-  doorColorTexture.center.set(0.5,0.5)
-// doorColorTexture.rotation = Math.PI / 4
-// 添加物体
-  const cubeGeometry = new THREE.BoxBufferGeometry(1, 1, 1);
-// 材质
-  const basicMaterial = new THREE.MeshBasicMaterial({
-    color: "#ffff00",
-    map: doorColorTexture,
-  });
-  const cube = new THREE.Mesh(cubeGeometry, basicMaterial);
-  scene.add(cube);
-
-// doorColorTexture.minFilter = THREE.NearestFilter;
-  doorColorTexture.magFilter = THREE.NearestMipMapNearestFilter;*/
-
-  // scene.add(axesHelper);
   scene.add(camera)
+  createScene()
 }
-const gui = new dat.GUI();
+let createScene = () => {
 
 //Create a DirectionalLight and turn on shadows for the light
-const light = new THREE.SpotLight( 0xffffff, 1 );
-light.position.set( 0, 30, 0 ); //default; light shining from top
-light.castShadow = true; // default false
-scene.add( light );
+  const light = new THREE.SpotLight( 0xffffff, 1 );
+  light.position.set( 0, 30, 0 ); //default; light shining from top
+  light.castShadow = true; // default false
+  scene.add( light );
 
 //Set up shadow properties for the light
-light.shadow.mapSize.width = 512; // default
-light.shadow.mapSize.height = 512; // default
-light.shadow.camera.near = 0.5; // default
-light.shadow.camera.far = 500; // default
+  light.shadow.mapSize.width = 512; // default
+  light.shadow.mapSize.height = 512; // default
+  light.shadow.camera.near = 0.5; // default
+  light.shadow.camera.far = 500; // default
 
 //Create a sphere that cast shadows (but does not receive them)
-const sphereGeometry = new THREE.SphereGeometry( 5, 32, 32 );
-const sphereMaterial = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
-const sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
-sphere.position.set(0,7,0)
-sphere.castShadow = true; //default is false
-sphere.receiveShadow = false; //default
-scene.add( sphere );
+  const sphereGeometry = new THREE.SphereGeometry( 5, 32, 32 );
+  const sphereMaterial = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
+  const sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
+  sphere.position.set(0,7,0)
+  sphere.castShadow = true; //default is false
+  sphere.receiveShadow = false; //default
+  scene.add( sphere );
 
 //Create a plane that receives shadows (but does not cast them)
-const planeGeometry = new THREE.PlaneGeometry( 200, 200, 32, 32 );
-const planeMaterial = new THREE.MeshStandardMaterial( { color: 0xffffff } )
-const plane = new THREE.Mesh( planeGeometry, planeMaterial );
-plane.receiveShadow = true;
-plane.position.set(0, -1, 0);
-plane.rotation.x = -Math.PI / 2;
-scene.add( plane );
+  const planeGeometry = new THREE.PlaneGeometry( 200, 200, 32, 32 );
+  const planeMaterial = new THREE.MeshStandardMaterial( { color: 0xffffff } )
+  const plane = new THREE.Mesh( planeGeometry, planeMaterial );
+  plane.receiveShadow = true;
+  plane.position.set(0, -1, 0);
+  plane.rotation.x = -Math.PI / 2;
+  scene.add( plane );
 
 //Create a helper for the shadow camera (optional)
-const helper = new THREE.DirectionalLightHelper( light, 0xffffff );
-scene.add( helper );
-console.log(light)
+  const helper = new THREE.DirectionalLightHelper( light, 0xffffff );
+  scene.add( helper );
+  console.log(light)
 
-const light1 = new THREE.PointLight( 0xffffff, 1, 20 );
-light1.position.set( 50, 50, 50 );
-scene.add( light1 );
+  const light1 = new THREE.PointLight( 0xffffff, 1, 20 );
+  light1.position.set( 50, 50, 50 );
+  scene.add( light1 );
 
-gui.add(sphere.position, "x").min(-5).max(5).step(0.1);
-gui
-    .add(light, "angle")
-    .min(0)
-    .max(Math.PI / 2)
-    .step(0.01);
-gui.add(light, "distance").min(0).max(10).step(0.01);
-gui.add(light.position, "x").min(-10).max(10).step(0.01);
-gui.add(light.position, "y").min(-10).max(100).step(1);
-gui.add(light, "penumbra").min(0).max(1).step(0.01);
-gui.add(light, "decay").min(0).max(5).step(0.01);
+  guiposition = gui.add(sphere.position, "x").min(-5).max(5).step(0.1);
+  guiangle = gui
+      .add(light, "angle")
+      .min(0)
+      .max(Math.PI / 2)
+      .step(0.01);
+  guidistance = gui.add(light, "distance").min(0).max(10).step(0.01);
+  guiX = gui.add(light.position, "x").min(-10).max(10).step(0.01);
+  guiY = gui.add(light.position, "y").min(-10).max(100).step(1);
+  guipenumbra = gui.add(light, "penumbra").min(0).max(1).step(0.01);
+  guidecay = gui.add(light, "decay").min(0).max(5).step(0.01);
+}
 /*
 gui
     .add(spotLight, "angle")
@@ -156,6 +138,22 @@ onMounted(() => {
   threejs.value.appendChild(renderer.domElement)
   renderer.render(scene, camera)
   render(controls, renderer,scene,camera)
+})
+
+onUnmounted(() => {
+  gui.remove(guiposition)
+  gui.remove(guiangle)
+  gui.remove(guidistance)
+  gui.remove(guiX)
+  gui.remove(guiY)
+  gui.remove(guipenumbra)
+  gui.remove(guidecay)
+  gui = null
+  scene.clear()
+
+  // controls = null
+  threejs.value = ''
+  window.addEventListener("resize", () => {});
 })
 </script>
 

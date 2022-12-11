@@ -20,9 +20,42 @@ const routes = [
                     import("../view/point/index"),
                 meta: { title: "工作台", icon: "icon-gongzuotai" },
             },
+            {
+                path: "/snowflake",
+                name: "snowflake",
+                component: () =>
+                    import("../view/snowflake/index"),
+                meta: { title: "雪花", icon: "icon-gongzuotai" },
+            },
+            {
+                path: "/rayCasting",
+                name: "rayCasting",
+                component: () =>
+                    import("../view/rayCasting/index"),
+                meta: { title: "光线投射", icon: "icon-gongzuotai" },
+            },
+            {
+                path: "/threeFull",
+                name: "threeFull",
+                component: () =>
+                    import("../view/threeFull/index"),
+                meta: { title: "滚动html", icon: "icon-gongzuotai" },
+            },
+            {
+                path: "/cannon",
+                name: "cannon",
+                component: () =>
+                    import("../view/cannon/index"),
+                meta: { title: "cannon物理引擎", icon: "icon-gongzuotai" },
+            },
         ],
     },
-
+    {
+        path: '/:pathMatch(.*)',
+        name: 'error',
+        component: import("../view/error/index"),
+        meta: { title: '404' },
+    },
 ];
 
 const router = createRouter({
