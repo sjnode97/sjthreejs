@@ -4,7 +4,7 @@ const routes = [
     {
         path: "/",
         name: "home",
-        redirect: "/index",
+        redirect: "/cannon",
         children: [
             {
                 path: "/index",
