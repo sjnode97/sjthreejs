@@ -169,6 +169,7 @@ function render(controls, renderer,scene,camera) {
 }
 onMounted(() => {
   createThree()
+  console.log(scene)
   threejs.value.appendChild(renderer.domElement)
   renderer.render(scene, camera)
   render(controls, renderer,scene,camera)

@@ -48,6 +48,13 @@ const routes = [
                     import("../view/cannon/index"),
                 meta: { title: "cannon物理引擎", icon: "icon-gongzuotai" },
             },
+            {
+                path: "/glsl",
+                name: "glsl",
+                component: () =>
+                    import("../view/glsl/index"),
+                meta: { title: "glsl-shader", icon: "icon-gongzuotai" },
+            },
         ],
     },
     {

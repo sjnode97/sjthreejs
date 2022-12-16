@@ -1,12 +1,10 @@
-const { defineConfig, devServer } = require('@vue/cli-service')
+const { defineConfig } = require('@vue/cli-service')
 const path = require("path");
 module.exports = defineConfig({
   transpileDependencies: true,
   lintOnSave: false,
   devServer: {
-    disableHostCheck: {
-      allowedHosts: 'all'
-    },
+    allowedHosts: "all",
     open: true,
     port: 3001, // 本机端口
   },
