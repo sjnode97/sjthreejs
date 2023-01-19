@@ -27,7 +27,9 @@ console.log(renderer)
 const controls = new OrbitControls(camera, renderer.domElement)
 controls.enableDamping = true;
 const clock = new THREE.Clock();
-
+setTimeout(() => {
+  console.log(obj)
+},1000)
 function createThree () {
 // 设置渲染的尺寸大小
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -151,7 +153,6 @@ onMounted(() => {
   render(controls, renderer,scene,camera)
 })
 onUnmounted(() => {
-  console.log(11)
   scene.clear()
   // controls = null
   dom.value = ''

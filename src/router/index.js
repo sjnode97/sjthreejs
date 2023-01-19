@@ -45,7 +45,7 @@ const routes = [
                 path: "/cannon",
                 name: "cannon",
                 component: () =>
-                    import("../view/cannon/index"),
+                    import("../view/cannon/classIndex"),
                 meta: { title: "cannon物理引擎", icon: "icon-gongzuotai" },
             },
             {
@@ -54,6 +54,20 @@ const routes = [
                 component: () =>
                     import("../view/glsl/index"),
                 meta: { title: "glsl-shader", icon: "icon-gongzuotai" },
+            },
+            {
+                path: "/fireworks",
+                name: "fireworks",
+                component: () =>
+                    import("../view/fireworks/index"),
+                meta: { title: "fireworks", icon: "icon-gongzuotai" },
+            },
+            {
+                path: "/water",
+                name: "water",
+                component: () =>
+                    import("../view/water/index"),
+                meta: { title: "water", icon: "icon-gongzuotai" },
             },
         ],
     },

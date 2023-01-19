@@ -1,6 +1,29 @@
 const { defineConfig } = require('@vue/cli-service')
 const path = require("path");
 module.exports = defineConfig({
+  configureWebpack: {
+    module: {
+      rules: [
+        {
+          test: /\.glsl$/,
+          loader: 'webpack-glsl-loader'
+        },
+        {
+          test: /\.(glb|gltf)$/,
+          use:
+              [
+                {
+                  loader: 'file-loader',
+                  options:
+                      {
+                        outputPath: 'assets/models/'
+                      }
+                }
+              ]
+        },
+      ]
+    },
+  },
   transpileDependencies: true,
   lintOnSave: false,
   devServer: {

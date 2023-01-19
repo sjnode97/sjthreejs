@@ -11,16 +11,20 @@ import * as THREE from "three";
 import scene from "@/tool/sceneFunction";
 import camera from "@/tool/cameraFunction";
 import renderer from "@/tool/rendererFunction";
+import basicVertex from './shader/row/vertex.glsl'
+import basicFragment from './shader/row/fragment.glsl'
 // 导入轨道控制器
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import ca1 from '../../assets/textures/ca.jpeg';
+
 let threejs = ref()
 
 // 导入动画库
 // import gsap from "gsap";
 // 导入dat.gui
 import * as dat from "dat.gui";
-let gui = new dat.GUI();
-
+const textureLoader = new THREE.TextureLoader()
+let texture = textureLoader.load(ca1)
 const controls = new OrbitControls(camera, renderer.domElement)
 controls.enableDamping = true;
 const clock = new THREE.Clock();
@@ -46,26 +50,45 @@ let createThree = () => {
   light.shadow.camera.far = 500; // default
   createdMesh()
 }
-
+let rawShaderMaterial
 let createdMesh = () => {
-  const shaderMaterial = new THREE.ShaderMaterial({
-    vertexShader: `
-      void main() {
-        gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
-      }
-    `,
-    fragmentShader: `
-      void main() {
-        gl_FragColor = vec4(1.0,0.0,0.0,1.0);
-      }
-    `
+  /*rawShaderMaterial = new THREE.RawShaderMaterial({
+    vertexShader: basicVertex,
+    fragmentShader: basicFragment,
+    // wireframe: true,
+    side: THREE.DoubleSide,
+    uniforms: {
+      uTime: {
+        value: 0
+      },
+      uTexture: {
+        value: texture
+      },
+    },
+  })*/
+  rawShaderMaterial = new THREE.RawShaderMaterial({
+    vertexShader: basicVertex,
+    fragmentShader: basicFragment,
+    // wireframe: true,
+    side: THREE.DoubleSide,
+    uniforms: {
+      uColor: {
+        value: new THREE.Color("purple"),
+      },
+      uTime: {
+        value: 0
+      },
+      uTexture: {
+        value: texture
+      },
+    },
   })
-  const material = new THREE.MeshBasicMaterial({color: "#00ff00"})
+// const material = new THREE.MeshBasicMaterial({color: "#00ff00"})
   let geo =  new THREE.PlaneBufferGeometry(1,1,64,64)
 // 创建平面
   const floor = new THREE.Mesh(
       geo,
-      shaderMaterial
+      rawShaderMaterial
   )
   scene.add(floor);
 }
@@ -87,22 +110,23 @@ window.addEventListener("resize", () => {
   //   设置渲染器的像素比
   renderer.setPixelRatio(window.devicePixelRatio);
 });
-
-function render(controls, renderer,scene,camera) {
+//controls, renderer,scene,camera
+function render() {
   let time = clock.getElapsedTime();
   //   let deltaTime = clock.getDelta();
   //     console.log("两次获取时间的间隔时间：", deltaTime);
   controls.update();
   renderer.render(scene,camera)
-  requestAnimationFrame(() => {
-    render(controls,renderer,scene,camera)
-  })
+  rawShaderMaterial.uniforms.uTime.value = time
+
+  requestAnimationFrame(render)
 }
 onMounted(() => {
   createThree()
   threejs.value.appendChild(renderer.domElement)
   renderer.render(scene, camera)
-  render(controls, renderer,scene,camera)
+  // render(controls, renderer,scene,camera)
+  render()
 })
 
 onUnmounted(() => {
